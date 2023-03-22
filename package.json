@@ -1,0 +1,28 @@
+{
+  "name": "@exoda-app/tokens",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "rimraf dist && tsc -d -p tsconfig.json",
+    "test": "jest",
+    "generate:types": "typechain --target ethers-v6 --out-dir src/types/contracts './src/abis/*.json'"
+  },
+  "keywords": [],
+  "author": "Ian Guimaraes",
+  "license": "ISC",
+  "devDependencies": {
+    "@typechain/ethers-v6": "^0.3.0",
+    "@types/jest": "^29.5.0",
+    "jest": "^29.5.0",
+    "rimraf": "^4.4.0",
+    "ts-jest": "^29.0.5",
+    "ts-node": "^10.9.1",
+    "typechain": "^8.1.1",
+    "typescript": "^5.0.2"
+  },
+  "dependencies": {
+    "bignumber.js": "^9.1.1",
+    "ethers": "^6.1.0"
+  }
+}
