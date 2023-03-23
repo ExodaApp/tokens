@@ -1,16 +1,16 @@
-import { PoolToken } from '../src'
+import { TokenPool } from '../src'
 import { Chains } from '../src/types/chain'
 
-describe('PoolToken', () => {
-    let poolToken: PoolToken
+describe('TokenPool', () => {
+    let poolToken: TokenPool
 
     beforeAll(async () => {
-        console.time('Pool token initialization')
-        poolToken = await PoolToken.init(
+        console.time('Token pool initialization')
+        poolToken = await TokenPool.init(
             '0xA478c2975Ab1Ea89e8196811F51A7B7Ade33eB11', // Uniswap's WETH-DAI
             Chains.ETH,
         )
-        console.timeEnd('Pool token initialization')
+        console.timeEnd('Token Pool initialization')
     })
 
     it('Should calculate the token price', () => {
