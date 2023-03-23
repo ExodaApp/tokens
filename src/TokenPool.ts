@@ -42,7 +42,7 @@ export class TokenPool extends BaseToken<UniswapV2Pair> {
         return null
     }
 
-    public static async init(address: string, chain: Chain): Promise<TokenPool> {
+    public static async initialize(address: string, chain: Chain): Promise<TokenPool> {
         const contract = UniswapV2Pair__factory.connect(address, providers[chain])
 
         const [
@@ -63,8 +63,8 @@ export class TokenPool extends BaseToken<UniswapV2Pair> {
         ])
 
         const [token0, token1] = await Promise.all([
-            Token.init(token0Address, chain),
-            Token.init(token1Address, chain),
+            Token.initialize(token0Address, chain),
+            Token.initialize(token1Address, chain),
         ]) 
 
         return new TokenPool(

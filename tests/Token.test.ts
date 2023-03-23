@@ -9,7 +9,7 @@ describe('Token', () => {
 
     beforeAll(async () => {
         console.time('Token initialization')
-        token = await Token.init(
+        token = await Token.initialize(
             '0x1f9840a85d5af5bf1d1762f925bdaddc4201f984', // UNI Token
             Chains.ETH,
         )

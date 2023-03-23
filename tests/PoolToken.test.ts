@@ -6,7 +6,7 @@ describe('TokenPool', () => {
 
     beforeAll(async () => {
         console.time('Token pool initialization')
-        poolToken = await TokenPool.init(
+        poolToken = await TokenPool.initialize(
             '0xA478c2975Ab1Ea89e8196811F51A7B7Ade33eB11', // Uniswap's WETH-DAI
             Chains.ETH,
         )
