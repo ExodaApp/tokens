@@ -10,7 +10,7 @@ interface Reserves {
     token1: bigint,
 }
 
-export class PoolToken extends BaseToken<UniswapV2Pair> {
+export class TokenPool extends BaseToken<UniswapV2Pair> {
     constructor(
         public token0: Token,
         public token1: Token,
@@ -42,7 +42,7 @@ export class PoolToken extends BaseToken<UniswapV2Pair> {
         return null
     }
 
-    public static async init(address: string, chain: Chain): Promise<PoolToken> {
+    public static async init(address: string, chain: Chain): Promise<TokenPool> {
         const contract = UniswapV2Pair__factory.connect(address, providers[chain])
 
         const [
@@ -67,7 +67,7 @@ export class PoolToken extends BaseToken<UniswapV2Pair> {
             Token.init(token1Address, chain),
         ]) 
 
-        return new PoolToken(
+        return new TokenPool(
             token0,
             token1,
             reserves,

@@ -3,11 +3,11 @@ This library provides an easy way to instaciate `ERC20` and `Uniswap V2 pair` to
 
 ## Usage
 ```ts
-import { Token, PoolToken, Chain } from '@exoda-app/tokens'
+import { Token, TokenPool, Chain } from '@exoda-app/tokens'
 
 const token = await Token.init('0x...', Chains.ETH)
 
-const poolToken = await PoolToken.init('0x...', Chains.ETH)
+const poolToken = await TokenPool.init('0x...', Chains.ETH)
 ```
 
 ## Models
@@ -39,7 +39,7 @@ Represents an `ERC20` token. Extends `BaseToken`
 - `updateBalance(user: string)`: fetches user balance from contract and call `BaseToken.setBalance` with the value received
 - `updateAllowance(user: string)`: fetches user allowance from contract and call `BaseToken.setAllowance` with the value received
 
-### PoolToken
+### TokenPool
 Represents an `Uniswap V2 Pair` token. Extends `BaseToken`
 
 #### Fields

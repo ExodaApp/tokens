@@ -1,5 +1,5 @@
 export * from './Token'
-export * from './PoolToken'
+export * from './TokenPool'
 export * from './BaseToken'
 export * from './PriceService'
 export * from './types'
