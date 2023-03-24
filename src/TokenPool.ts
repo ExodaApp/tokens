@@ -6,8 +6,8 @@ import { Chain } from './types/chain'
 import { providers } from './constants/providers'
 
 interface Reserves {
-    token0: bigint,
-    token1: bigint,
+    token0: string,
+    token1: string,
 }
 
 export class TokenPool extends BaseToken<UniswapV2Pair> {
@@ -18,8 +18,8 @@ export class TokenPool extends BaseToken<UniswapV2Pair> {
         chain: Chain,
         address: string,
         name: string,
-        decimals: bigint,
-        totalSupply: bigint,
+        decimals: number,
+        totalSupply: string,
     ) {
         super(chain, address, name, decimals, totalSupply)
     }
@@ -42,6 +42,21 @@ export class TokenPool extends BaseToken<UniswapV2Pair> {
         return null
     }
 
+    public async updateBalance(user: string) {
+        this.rawBalance = (await this.contract.balanceOf(user)).toString()
+
+        if (!this.rawBalance)
+            throw Error('no balance')
+
+        this.balance = this.valueToTokenDecimals(this.rawBalance)
+    }
+
+    public async updateAllowance(user: string, spender: string) {
+        this.rawAllowance = (await this.contract.allowance(user, spender)).toString()
+
+        this.allowance = this.valueToTokenDecimals(this.rawAllowance)
+    }
+
     public static async initialize(address: string, chain: Chain): Promise<TokenPool> {
         const contract = UniswapV2Pair__factory.connect(address, providers[chain])
 
@@ -57,9 +72,12 @@ export class TokenPool extends BaseToken<UniswapV2Pair> {
             contract.token1(),
             contract.name(),
             contract.decimals(),
-            contract.totalSupply(),
+            contract.totalSupply().then(ts => ts.toString()),
             contract.getReserves()
-                .then(r => ({ token0: r._reserve0, token1: r._reserve1 })),
+                .then(r => ({
+                    token0: r._reserve0.toString(),
+                    token1: r._reserve1.toString(),
+                })),
         ])
 
         const [token0, token1] = await Promise.all([

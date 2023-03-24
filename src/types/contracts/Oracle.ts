@@ -3,29 +3,49 @@
 /* eslint-disable */
 import type {
   BaseContract,
+  BigNumber,
   BigNumberish,
   BytesLike,
-  FunctionFragment,
-  Result,
-  Interface,
-  EventFragment,
-  AddressLike,
-  ContractRunner,
-  ContractMethod,
-  Listener,
+  CallOverrides,
+  ContractTransaction,
+  Overrides,
+  PopulatedTransaction,
+  Signer,
+  utils,
 } from "ethers";
 import type {
-  TypedContractEvent,
-  TypedDeferredTopicFilter,
-  TypedEventLog,
-  TypedLogDescription,
+  FunctionFragment,
+  Result,
+  EventFragment,
+} from "@ethersproject/abi";
+import type { Listener, Provider } from "@ethersproject/providers";
+import type {
+  TypedEventFilter,
+  TypedEvent,
   TypedListener,
-  TypedContractMethod,
+  OnEvent,
+  PromiseOrValue,
 } from "./common";
 
-export interface OracleInterface extends Interface {
+export interface OracleInterface extends utils.Interface {
+  functions: {
+    "addConnector(address)": FunctionFragment;
+    "addOracle(address,uint8)": FunctionFragment;
+    "connectors()": FunctionFragment;
+    "getRate(address,address,bool)": FunctionFragment;
+    "getRateToEth(address,bool)": FunctionFragment;
+    "multiWrapper()": FunctionFragment;
+    "oracles()": FunctionFragment;
+    "owner()": FunctionFragment;
+    "removeConnector(address)": FunctionFragment;
+    "removeOracle(address,uint8)": FunctionFragment;
+    "renounceOwnership()": FunctionFragment;
+    "setMultiWrapper(address)": FunctionFragment;
+    "transferOwnership(address)": FunctionFragment;
+  };
+
   getFunction(
-    nameOrSignature:
+    nameOrSignatureOrTopic:
       | "addConnector"
       | "addOracle"
       | "connectors"
@@ -41,23 +61,13 @@ export interface OracleInterface extends Interface {
       | "transferOwnership"
   ): FunctionFragment;
 
-  getEvent(
-    nameOrSignatureOrTopic:
-      | "ConnectorAdded"
-      | "ConnectorRemoved"
-      | "MultiWrapperUpdated"
-      | "OracleAdded"
-      | "OracleRemoved"
-      | "OwnershipTransferred"
-  ): EventFragment;
-
   encodeFunctionData(
     functionFragment: "addConnector",
-    values: [AddressLike]
+    values: [PromiseOrValue<string>]
   ): string;
   encodeFunctionData(
     functionFragment: "addOracle",
-    values: [AddressLike, BigNumberish]
+    values: [PromiseOrValue<string>, PromiseOrValue<BigNumberish>]
   ): string;
   encodeFunctionData(
     functionFragment: "connectors",
@@ -65,11 +75,15 @@ export interface OracleInterface extends Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "getRate",
-    values: [AddressLike, AddressLike, boolean]
+    values: [
+      PromiseOrValue<string>,
+      PromiseOrValue<string>,
+      PromiseOrValue<boolean>
+    ]
   ): string;
   encodeFunctionData(
     functionFragment: "getRateToEth",
-    values: [AddressLike, boolean]
+    values: [PromiseOrValue<string>, PromiseOrValue<boolean>]
   ): string;
   encodeFunctionData(
     functionFragment: "multiWrapper",
@@ -79,11 +93,11 @@ export interface OracleInterface extends Interface {
   encodeFunctionData(functionFragment: "owner", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "removeConnector",
-    values: [AddressLike]
+    values: [PromiseOrValue<string>]
   ): string;
   encodeFunctionData(
     functionFragment: "removeOracle",
-    values: [AddressLike, BigNumberish]
+    values: [PromiseOrValue<string>, PromiseOrValue<BigNumberish>]
   ): string;
   encodeFunctionData(
     functionFragment: "renounceOwnership",
@@ -91,11 +105,11 @@ export interface OracleInterface extends Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "setMultiWrapper",
-    values: [AddressLike]
+    values: [PromiseOrValue<string>]
   ): string;
   encodeFunctionData(
     functionFragment: "transferOwnership",
-    values: [AddressLike]
+    values: [PromiseOrValue<string>]
   ): string;
 
   decodeFunctionResult(
@@ -135,361 +149,452 @@ export interface OracleInterface extends Interface {
     functionFragment: "transferOwnership",
     data: BytesLike
   ): Result;
+
+  events: {
+    "ConnectorAdded(address)": EventFragment;
+    "ConnectorRemoved(address)": EventFragment;
+    "MultiWrapperUpdated(address)": EventFragment;
+    "OracleAdded(address,uint8)": EventFragment;
+    "OracleRemoved(address,uint8)": EventFragment;
+    "OwnershipTransferred(address,address)": EventFragment;
+  };
+
+  getEvent(nameOrSignatureOrTopic: "ConnectorAdded"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "ConnectorRemoved"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "MultiWrapperUpdated"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "OracleAdded"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "OracleRemoved"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "OwnershipTransferred"): EventFragment;
 }
 
-export namespace ConnectorAddedEvent {
-  export type InputTuple = [connector: AddressLike];
-  export type OutputTuple = [connector: string];
-  export interface OutputObject {
-    connector: string;
-  }
-  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
-  export type Filter = TypedDeferredTopicFilter<Event>;
-  export type Log = TypedEventLog<Event>;
-  export type LogDescription = TypedLogDescription<Event>;
+export interface ConnectorAddedEventObject {
+  connector: string;
 }
+export type ConnectorAddedEvent = TypedEvent<
+  [string],
+  ConnectorAddedEventObject
+>;
 
-export namespace ConnectorRemovedEvent {
-  export type InputTuple = [connector: AddressLike];
-  export type OutputTuple = [connector: string];
-  export interface OutputObject {
-    connector: string;
-  }
-  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
-  export type Filter = TypedDeferredTopicFilter<Event>;
-  export type Log = TypedEventLog<Event>;
-  export type LogDescription = TypedLogDescription<Event>;
-}
+export type ConnectorAddedEventFilter = TypedEventFilter<ConnectorAddedEvent>;
 
-export namespace MultiWrapperUpdatedEvent {
-  export type InputTuple = [multiWrapper: AddressLike];
-  export type OutputTuple = [multiWrapper: string];
-  export interface OutputObject {
-    multiWrapper: string;
-  }
-  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
-  export type Filter = TypedDeferredTopicFilter<Event>;
-  export type Log = TypedEventLog<Event>;
-  export type LogDescription = TypedLogDescription<Event>;
+export interface ConnectorRemovedEventObject {
+  connector: string;
 }
+export type ConnectorRemovedEvent = TypedEvent<
+  [string],
+  ConnectorRemovedEventObject
+>;
 
-export namespace OracleAddedEvent {
-  export type InputTuple = [oracle: AddressLike, oracleType: BigNumberish];
-  export type OutputTuple = [oracle: string, oracleType: bigint];
-  export interface OutputObject {
-    oracle: string;
-    oracleType: bigint;
-  }
-  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
-  export type Filter = TypedDeferredTopicFilter<Event>;
-  export type Log = TypedEventLog<Event>;
-  export type LogDescription = TypedLogDescription<Event>;
-}
+export type ConnectorRemovedEventFilter =
+  TypedEventFilter<ConnectorRemovedEvent>;
 
-export namespace OracleRemovedEvent {
-  export type InputTuple = [oracle: AddressLike, oracleType: BigNumberish];
-  export type OutputTuple = [oracle: string, oracleType: bigint];
-  export interface OutputObject {
-    oracle: string;
-    oracleType: bigint;
-  }
-  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
-  export type Filter = TypedDeferredTopicFilter<Event>;
-  export type Log = TypedEventLog<Event>;
-  export type LogDescription = TypedLogDescription<Event>;
+export interface MultiWrapperUpdatedEventObject {
+  multiWrapper: string;
 }
+export type MultiWrapperUpdatedEvent = TypedEvent<
+  [string],
+  MultiWrapperUpdatedEventObject
+>;
 
-export namespace OwnershipTransferredEvent {
-  export type InputTuple = [previousOwner: AddressLike, newOwner: AddressLike];
-  export type OutputTuple = [previousOwner: string, newOwner: string];
-  export interface OutputObject {
-    previousOwner: string;
-    newOwner: string;
-  }
-  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
-  export type Filter = TypedDeferredTopicFilter<Event>;
-  export type Log = TypedEventLog<Event>;
-  export type LogDescription = TypedLogDescription<Event>;
+export type MultiWrapperUpdatedEventFilter =
+  TypedEventFilter<MultiWrapperUpdatedEvent>;
+
+export interface OracleAddedEventObject {
+  oracle: string;
+  oracleType: number;
 }
+export type OracleAddedEvent = TypedEvent<
+  [string, number],
+  OracleAddedEventObject
+>;
+
+export type OracleAddedEventFilter = TypedEventFilter<OracleAddedEvent>;
+
+export interface OracleRemovedEventObject {
+  oracle: string;
+  oracleType: number;
+}
+export type OracleRemovedEvent = TypedEvent<
+  [string, number],
+  OracleRemovedEventObject
+>;
+
+export type OracleRemovedEventFilter = TypedEventFilter<OracleRemovedEvent>;
+
+export interface OwnershipTransferredEventObject {
+  previousOwner: string;
+  newOwner: string;
+}
+export type OwnershipTransferredEvent = TypedEvent<
+  [string, string],
+  OwnershipTransferredEventObject
+>;
+
+export type OwnershipTransferredEventFilter =
+  TypedEventFilter<OwnershipTransferredEvent>;
 
 export interface Oracle extends BaseContract {
-  connect(runner?: ContractRunner | null): BaseContract;
-  attach(addressOrName: AddressLike): this;
+  connect(signerOrProvider: Signer | Provider | string): this;
+  attach(addressOrName: string): this;
   deployed(): Promise<this>;
 
   interface: OracleInterface;
 
-  queryFilter<TCEvent extends TypedContractEvent>(
-    event: TCEvent,
+  queryFilter<TEvent extends TypedEvent>(
+    event: TypedEventFilter<TEvent>,
     fromBlockOrBlockhash?: string | number | undefined,
     toBlock?: string | number | undefined
-  ): Promise<Array<TypedEventLog<TCEvent>>>;
-  queryFilter<TCEvent extends TypedContractEvent>(
-    filter: TypedDeferredTopicFilter<TCEvent>,
-    fromBlockOrBlockhash?: string | number | undefined,
-    toBlock?: string | number | undefined
-  ): Promise<Array<TypedEventLog<TCEvent>>>;
+  ): Promise<Array<TEvent>>;
 
-  on<TCEvent extends TypedContractEvent>(
-    event: TCEvent,
-    listener: TypedListener<TCEvent>
-  ): Promise<this>;
-  on<TCEvent extends TypedContractEvent>(
-    filter: TypedDeferredTopicFilter<TCEvent>,
-    listener: TypedListener<TCEvent>
-  ): Promise<this>;
+  listeners<TEvent extends TypedEvent>(
+    eventFilter?: TypedEventFilter<TEvent>
+  ): Array<TypedListener<TEvent>>;
+  listeners(eventName?: string): Array<Listener>;
+  removeAllListeners<TEvent extends TypedEvent>(
+    eventFilter: TypedEventFilter<TEvent>
+  ): this;
+  removeAllListeners(eventName?: string): this;
+  off: OnEvent<this>;
+  on: OnEvent<this>;
+  once: OnEvent<this>;
+  removeListener: OnEvent<this>;
 
-  once<TCEvent extends TypedContractEvent>(
-    event: TCEvent,
-    listener: TypedListener<TCEvent>
-  ): Promise<this>;
-  once<TCEvent extends TypedContractEvent>(
-    filter: TypedDeferredTopicFilter<TCEvent>,
-    listener: TypedListener<TCEvent>
-  ): Promise<this>;
+  functions: {
+    addConnector(
+      connector: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
 
-  listeners<TCEvent extends TypedContractEvent>(
-    event: TCEvent
-  ): Promise<Array<TypedListener<TCEvent>>>;
-  listeners(eventName?: string): Promise<Array<Listener>>;
-  removeAllListeners<TCEvent extends TypedContractEvent>(
-    event?: TCEvent
-  ): Promise<this>;
+    addOracle(
+      oracle: PromiseOrValue<string>,
+      oracleKind: PromiseOrValue<BigNumberish>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
 
-  addConnector: TypedContractMethod<
-    [connector: AddressLike],
-    [void],
-    "nonpayable"
+    connectors(
+      overrides?: CallOverrides
+    ): Promise<[string[]] & { allConnectors: string[] }>;
+
+    getRate(
+      srcToken: PromiseOrValue<string>,
+      dstToken: PromiseOrValue<string>,
+      useWrappers: PromiseOrValue<boolean>,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber] & { weightedRate: BigNumber }>;
+
+    getRateToEth(
+      srcToken: PromiseOrValue<string>,
+      useSrcWrappers: PromiseOrValue<boolean>,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber] & { weightedRate: BigNumber }>;
+
+    multiWrapper(overrides?: CallOverrides): Promise<[string]>;
+
+    oracles(
+      overrides?: CallOverrides
+    ): Promise<
+      [string[], number[]] & { allOracles: string[]; oracleTypes: number[] }
+    >;
+
+    owner(overrides?: CallOverrides): Promise<[string]>;
+
+    removeConnector(
+      connector: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
+    removeOracle(
+      oracle: PromiseOrValue<string>,
+      oracleKind: PromiseOrValue<BigNumberish>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
+    renounceOwnership(
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
+    setMultiWrapper(
+      _multiWrapper: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
+    transferOwnership(
+      newOwner: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+  };
+
+  addConnector(
+    connector: PromiseOrValue<string>,
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
+  addOracle(
+    oracle: PromiseOrValue<string>,
+    oracleKind: PromiseOrValue<BigNumberish>,
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
+  connectors(overrides?: CallOverrides): Promise<string[]>;
+
+  getRate(
+    srcToken: PromiseOrValue<string>,
+    dstToken: PromiseOrValue<string>,
+    useWrappers: PromiseOrValue<boolean>,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
+  getRateToEth(
+    srcToken: PromiseOrValue<string>,
+    useSrcWrappers: PromiseOrValue<boolean>,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
+  multiWrapper(overrides?: CallOverrides): Promise<string>;
+
+  oracles(
+    overrides?: CallOverrides
+  ): Promise<
+    [string[], number[]] & { allOracles: string[]; oracleTypes: number[] }
   >;
 
-  addOracle: TypedContractMethod<
-    [oracle: AddressLike, oracleKind: BigNumberish],
-    [void],
-    "nonpayable"
-  >;
+  owner(overrides?: CallOverrides): Promise<string>;
 
-  connectors: TypedContractMethod<[], [string[]], "view">;
+  removeConnector(
+    connector: PromiseOrValue<string>,
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
 
-  getRate: TypedContractMethod<
-    [srcToken: AddressLike, dstToken: AddressLike, useWrappers: boolean],
-    [bigint],
-    "view"
-  >;
+  removeOracle(
+    oracle: PromiseOrValue<string>,
+    oracleKind: PromiseOrValue<BigNumberish>,
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
 
-  getRateToEth: TypedContractMethod<
-    [srcToken: AddressLike, useSrcWrappers: boolean],
-    [bigint],
-    "view"
-  >;
+  renounceOwnership(
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
 
-  multiWrapper: TypedContractMethod<[], [string], "view">;
+  setMultiWrapper(
+    _multiWrapper: PromiseOrValue<string>,
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
 
-  oracles: TypedContractMethod<
-    [],
-    [[string[], bigint[]] & { allOracles: string[]; oracleTypes: bigint[] }],
-    "view"
-  >;
+  transferOwnership(
+    newOwner: PromiseOrValue<string>,
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
 
-  owner: TypedContractMethod<[], [string], "view">;
+  callStatic: {
+    addConnector(
+      connector: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
-  removeConnector: TypedContractMethod<
-    [connector: AddressLike],
-    [void],
-    "nonpayable"
-  >;
+    addOracle(
+      oracle: PromiseOrValue<string>,
+      oracleKind: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
-  removeOracle: TypedContractMethod<
-    [oracle: AddressLike, oracleKind: BigNumberish],
-    [void],
-    "nonpayable"
-  >;
+    connectors(overrides?: CallOverrides): Promise<string[]>;
 
-  renounceOwnership: TypedContractMethod<[], [void], "nonpayable">;
+    getRate(
+      srcToken: PromiseOrValue<string>,
+      dstToken: PromiseOrValue<string>,
+      useWrappers: PromiseOrValue<boolean>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
-  setMultiWrapper: TypedContractMethod<
-    [_multiWrapper: AddressLike],
-    [void],
-    "nonpayable"
-  >;
+    getRateToEth(
+      srcToken: PromiseOrValue<string>,
+      useSrcWrappers: PromiseOrValue<boolean>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
-  transferOwnership: TypedContractMethod<
-    [newOwner: AddressLike],
-    [void],
-    "nonpayable"
-  >;
+    multiWrapper(overrides?: CallOverrides): Promise<string>;
 
-  getFunction<T extends ContractMethod = ContractMethod>(
-    key: string | FunctionFragment
-  ): T;
+    oracles(
+      overrides?: CallOverrides
+    ): Promise<
+      [string[], number[]] & { allOracles: string[]; oracleTypes: number[] }
+    >;
 
-  getFunction(
-    nameOrSignature: "addConnector"
-  ): TypedContractMethod<[connector: AddressLike], [void], "nonpayable">;
-  getFunction(
-    nameOrSignature: "addOracle"
-  ): TypedContractMethod<
-    [oracle: AddressLike, oracleKind: BigNumberish],
-    [void],
-    "nonpayable"
-  >;
-  getFunction(
-    nameOrSignature: "connectors"
-  ): TypedContractMethod<[], [string[]], "view">;
-  getFunction(
-    nameOrSignature: "getRate"
-  ): TypedContractMethod<
-    [srcToken: AddressLike, dstToken: AddressLike, useWrappers: boolean],
-    [bigint],
-    "view"
-  >;
-  getFunction(
-    nameOrSignature: "getRateToEth"
-  ): TypedContractMethod<
-    [srcToken: AddressLike, useSrcWrappers: boolean],
-    [bigint],
-    "view"
-  >;
-  getFunction(
-    nameOrSignature: "multiWrapper"
-  ): TypedContractMethod<[], [string], "view">;
-  getFunction(
-    nameOrSignature: "oracles"
-  ): TypedContractMethod<
-    [],
-    [[string[], bigint[]] & { allOracles: string[]; oracleTypes: bigint[] }],
-    "view"
-  >;
-  getFunction(
-    nameOrSignature: "owner"
-  ): TypedContractMethod<[], [string], "view">;
-  getFunction(
-    nameOrSignature: "removeConnector"
-  ): TypedContractMethod<[connector: AddressLike], [void], "nonpayable">;
-  getFunction(
-    nameOrSignature: "removeOracle"
-  ): TypedContractMethod<
-    [oracle: AddressLike, oracleKind: BigNumberish],
-    [void],
-    "nonpayable"
-  >;
-  getFunction(
-    nameOrSignature: "renounceOwnership"
-  ): TypedContractMethod<[], [void], "nonpayable">;
-  getFunction(
-    nameOrSignature: "setMultiWrapper"
-  ): TypedContractMethod<[_multiWrapper: AddressLike], [void], "nonpayable">;
-  getFunction(
-    nameOrSignature: "transferOwnership"
-  ): TypedContractMethod<[newOwner: AddressLike], [void], "nonpayable">;
+    owner(overrides?: CallOverrides): Promise<string>;
 
-  getEvent(
-    key: "ConnectorAdded"
-  ): TypedContractEvent<
-    ConnectorAddedEvent.InputTuple,
-    ConnectorAddedEvent.OutputTuple,
-    ConnectorAddedEvent.OutputObject
-  >;
-  getEvent(
-    key: "ConnectorRemoved"
-  ): TypedContractEvent<
-    ConnectorRemovedEvent.InputTuple,
-    ConnectorRemovedEvent.OutputTuple,
-    ConnectorRemovedEvent.OutputObject
-  >;
-  getEvent(
-    key: "MultiWrapperUpdated"
-  ): TypedContractEvent<
-    MultiWrapperUpdatedEvent.InputTuple,
-    MultiWrapperUpdatedEvent.OutputTuple,
-    MultiWrapperUpdatedEvent.OutputObject
-  >;
-  getEvent(
-    key: "OracleAdded"
-  ): TypedContractEvent<
-    OracleAddedEvent.InputTuple,
-    OracleAddedEvent.OutputTuple,
-    OracleAddedEvent.OutputObject
-  >;
-  getEvent(
-    key: "OracleRemoved"
-  ): TypedContractEvent<
-    OracleRemovedEvent.InputTuple,
-    OracleRemovedEvent.OutputTuple,
-    OracleRemovedEvent.OutputObject
-  >;
-  getEvent(
-    key: "OwnershipTransferred"
-  ): TypedContractEvent<
-    OwnershipTransferredEvent.InputTuple,
-    OwnershipTransferredEvent.OutputTuple,
-    OwnershipTransferredEvent.OutputObject
-  >;
+    removeConnector(
+      connector: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    removeOracle(
+      oracle: PromiseOrValue<string>,
+      oracleKind: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    renounceOwnership(overrides?: CallOverrides): Promise<void>;
+
+    setMultiWrapper(
+      _multiWrapper: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    transferOwnership(
+      newOwner: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<void>;
+  };
 
   filters: {
-    "ConnectorAdded(address)": TypedContractEvent<
-      ConnectorAddedEvent.InputTuple,
-      ConnectorAddedEvent.OutputTuple,
-      ConnectorAddedEvent.OutputObject
-    >;
-    ConnectorAdded: TypedContractEvent<
-      ConnectorAddedEvent.InputTuple,
-      ConnectorAddedEvent.OutputTuple,
-      ConnectorAddedEvent.OutputObject
-    >;
+    "ConnectorAdded(address)"(connector?: null): ConnectorAddedEventFilter;
+    ConnectorAdded(connector?: null): ConnectorAddedEventFilter;
 
-    "ConnectorRemoved(address)": TypedContractEvent<
-      ConnectorRemovedEvent.InputTuple,
-      ConnectorRemovedEvent.OutputTuple,
-      ConnectorRemovedEvent.OutputObject
-    >;
-    ConnectorRemoved: TypedContractEvent<
-      ConnectorRemovedEvent.InputTuple,
-      ConnectorRemovedEvent.OutputTuple,
-      ConnectorRemovedEvent.OutputObject
-    >;
+    "ConnectorRemoved(address)"(connector?: null): ConnectorRemovedEventFilter;
+    ConnectorRemoved(connector?: null): ConnectorRemovedEventFilter;
 
-    "MultiWrapperUpdated(address)": TypedContractEvent<
-      MultiWrapperUpdatedEvent.InputTuple,
-      MultiWrapperUpdatedEvent.OutputTuple,
-      MultiWrapperUpdatedEvent.OutputObject
-    >;
-    MultiWrapperUpdated: TypedContractEvent<
-      MultiWrapperUpdatedEvent.InputTuple,
-      MultiWrapperUpdatedEvent.OutputTuple,
-      MultiWrapperUpdatedEvent.OutputObject
-    >;
+    "MultiWrapperUpdated(address)"(
+      multiWrapper?: null
+    ): MultiWrapperUpdatedEventFilter;
+    MultiWrapperUpdated(multiWrapper?: null): MultiWrapperUpdatedEventFilter;
 
-    "OracleAdded(address,uint8)": TypedContractEvent<
-      OracleAddedEvent.InputTuple,
-      OracleAddedEvent.OutputTuple,
-      OracleAddedEvent.OutputObject
-    >;
-    OracleAdded: TypedContractEvent<
-      OracleAddedEvent.InputTuple,
-      OracleAddedEvent.OutputTuple,
-      OracleAddedEvent.OutputObject
-    >;
+    "OracleAdded(address,uint8)"(
+      oracle?: null,
+      oracleType?: null
+    ): OracleAddedEventFilter;
+    OracleAdded(oracle?: null, oracleType?: null): OracleAddedEventFilter;
 
-    "OracleRemoved(address,uint8)": TypedContractEvent<
-      OracleRemovedEvent.InputTuple,
-      OracleRemovedEvent.OutputTuple,
-      OracleRemovedEvent.OutputObject
-    >;
-    OracleRemoved: TypedContractEvent<
-      OracleRemovedEvent.InputTuple,
-      OracleRemovedEvent.OutputTuple,
-      OracleRemovedEvent.OutputObject
-    >;
+    "OracleRemoved(address,uint8)"(
+      oracle?: null,
+      oracleType?: null
+    ): OracleRemovedEventFilter;
+    OracleRemoved(oracle?: null, oracleType?: null): OracleRemovedEventFilter;
 
-    "OwnershipTransferred(address,address)": TypedContractEvent<
-      OwnershipTransferredEvent.InputTuple,
-      OwnershipTransferredEvent.OutputTuple,
-      OwnershipTransferredEvent.OutputObject
-    >;
-    OwnershipTransferred: TypedContractEvent<
-      OwnershipTransferredEvent.InputTuple,
-      OwnershipTransferredEvent.OutputTuple,
-      OwnershipTransferredEvent.OutputObject
-    >;
+    "OwnershipTransferred(address,address)"(
+      previousOwner?: PromiseOrValue<string> | null,
+      newOwner?: PromiseOrValue<string> | null
+    ): OwnershipTransferredEventFilter;
+    OwnershipTransferred(
+      previousOwner?: PromiseOrValue<string> | null,
+      newOwner?: PromiseOrValue<string> | null
+    ): OwnershipTransferredEventFilter;
+  };
+
+  estimateGas: {
+    addConnector(
+      connector: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
+    addOracle(
+      oracle: PromiseOrValue<string>,
+      oracleKind: PromiseOrValue<BigNumberish>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
+    connectors(overrides?: CallOverrides): Promise<BigNumber>;
+
+    getRate(
+      srcToken: PromiseOrValue<string>,
+      dstToken: PromiseOrValue<string>,
+      useWrappers: PromiseOrValue<boolean>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    getRateToEth(
+      srcToken: PromiseOrValue<string>,
+      useSrcWrappers: PromiseOrValue<boolean>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    multiWrapper(overrides?: CallOverrides): Promise<BigNumber>;
+
+    oracles(overrides?: CallOverrides): Promise<BigNumber>;
+
+    owner(overrides?: CallOverrides): Promise<BigNumber>;
+
+    removeConnector(
+      connector: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
+    removeOracle(
+      oracle: PromiseOrValue<string>,
+      oracleKind: PromiseOrValue<BigNumberish>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
+    renounceOwnership(
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
+    setMultiWrapper(
+      _multiWrapper: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
+    transferOwnership(
+      newOwner: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+  };
+
+  populateTransaction: {
+    addConnector(
+      connector: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
+    addOracle(
+      oracle: PromiseOrValue<string>,
+      oracleKind: PromiseOrValue<BigNumberish>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
+    connectors(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    getRate(
+      srcToken: PromiseOrValue<string>,
+      dstToken: PromiseOrValue<string>,
+      useWrappers: PromiseOrValue<boolean>,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    getRateToEth(
+      srcToken: PromiseOrValue<string>,
+      useSrcWrappers: PromiseOrValue<boolean>,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    multiWrapper(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    oracles(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    owner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    removeConnector(
+      connector: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
+    removeOracle(
+      oracle: PromiseOrValue<string>,
+      oracleKind: PromiseOrValue<BigNumberish>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
+    renounceOwnership(
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
+    setMultiWrapper(
+      _multiWrapper: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
+    transferOwnership(
+      newOwner: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
   };
 }

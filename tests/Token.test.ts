@@ -25,11 +25,11 @@ describe('Token', () => {
     }) 
 
     it('Should initialize total supply correctly', () => {
-        expect(token.totalSupply).toBe(1000000000000000000000000000n)
+        expect(token.totalSupply).toBe('1000000000000000000000000000')
     }) 
 
     it('Should initialize decimals correctly', () => {
-        expect(token.decimals).toBe(18n)
+        expect(token.decimals).toBe(18)
     }) 
 
     it('Should intialize token price', () => {
@@ -40,14 +40,14 @@ describe('Token', () => {
         await token.updateBalance(UNI_HOLDER)
 
         expect(token.balance).toBe(9000000)
-        expect(token.rawBalance).toBe(9000000000000000000000000n)
+        expect(token.rawBalance).toBe('9000000000000000000000000')
     }) 
 
     it('Should update allowance correctly', async () => {
         await token.updateAllowance(UNI_HOLDER, ZERO_ADDRESS)
 
         expect(token.allowance).toBe(0)
-        expect(token.rawAllowance).toBe(0n)
+        expect(token.rawAllowance).toBe('0')
     }) 
 })
 

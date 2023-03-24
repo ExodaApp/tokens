@@ -1,12 +1,12 @@
-import { BaseContract } from 'ethers'
+import { Contract } from 'ethers'
 import { Chain } from './types/chain'
 import { BigNumber } from 'bignumber.js'
 
-export abstract class BaseToken<T extends BaseContract> {
+export abstract class BaseToken<T extends Contract> {
     public allowance?: number
     public balance?: number
-    public rawBalance?: bigint
-    public rawAllowance?: bigint
+    public rawBalance?: string
+    public rawAllowance?: string
 
     public abstract symbol: string
     public abstract price: number | null
@@ -15,23 +15,23 @@ export abstract class BaseToken<T extends BaseContract> {
         public chain: Chain,
         public address: string,
         public name: string,
-        public decimals: bigint,
-        public totalSupply: bigint,
+        public decimals: number,
+        public totalSupply: string,
     ) {}
 
-    public setBalance(rawBalance: bigint) {
+    public setBalance(rawBalance: string) {
         this.rawBalance = rawBalance
         this.balance = this.valueToTokenDecimals(rawBalance)
     }
 
-    public setAllowance(rawAllowance: bigint) {
+    public setAllowance(rawAllowance: string) {
         this.rawAllowance = rawAllowance 
         this.allowance = this.valueToTokenDecimals(rawAllowance)
     }
 
-    public valueToTokenDecimals(rawValue: bigint): number {
+    public valueToTokenDecimals(rawValue: string): number {
         const value = new BigNumber(rawValue.toString())
-        const basisPoints = new BigNumber((10n ** this.decimals).toString())
+        const basisPoints = new BigNumber(new BigNumber(10).pow(this.decimals))
 
         return value.div(basisPoints).toNumber()
     }

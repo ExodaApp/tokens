@@ -1,13 +1,13 @@
-import { JsonRpcProvider } from 'ethers'
+import { JsonRpcBatchProvider } from '@ethersproject/providers'
 import { ChainMap, Chains } from '../types/chain'
 import { chainsInfo } from './chains'
 
-export const providers: ChainMap<JsonRpcProvider> = {
-    [Chains.ETH]: new JsonRpcProvider(chainsInfo[Chains.ETH].rpc),
-    [Chains.AVAX]: new JsonRpcProvider(chainsInfo[Chains.AVAX].rpc),
-    [Chains.POLYGON]: new JsonRpcProvider(chainsInfo[Chains.POLYGON].rpc),
-    [Chains.BSC]: new JsonRpcProvider(chainsInfo[Chains.BSC].rpc),
-    [Chains.OPTIMISM]: new JsonRpcProvider(chainsInfo[Chains.OPTIMISM].rpc),
-    [Chains.ARBITRUIM]: new JsonRpcProvider(chainsInfo[Chains.ARBITRUIM].rpc),
+export const providers: ChainMap<JsonRpcBatchProvider> = {
+    [Chains.ETH]: new JsonRpcBatchProvider(chainsInfo[Chains.ETH].rpc),
+    [Chains.AVAX]: new JsonRpcBatchProvider(chainsInfo[Chains.AVAX].rpc),
+    [Chains.POLYGON]: new JsonRpcBatchProvider(chainsInfo[Chains.POLYGON].rpc),
+    [Chains.BSC]: new JsonRpcBatchProvider(chainsInfo[Chains.BSC].rpc),
+    [Chains.OPTIMISM]: new JsonRpcBatchProvider(chainsInfo[Chains.OPTIMISM].rpc),
+    [Chains.ARBITRUIM]: new JsonRpcBatchProvider(chainsInfo[Chains.ARBITRUIM].rpc),
 }
 
