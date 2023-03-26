@@ -17,26 +17,30 @@ export class Token extends BaseToken<Erc20> {
         super(chain, address, name, decimals, totalSupply)
     }
 
-    public async updateBalance(user: string) {
+    public async updateBalance(user: string): Promise<Token> {
         this.rawBalance = (await this.contract.balanceOf(user)).toString()
 
         if (!this.rawBalance)
             throw Error('no balance')
 
         this.balance = this.valueToTokenDecimals(this.rawBalance)
+
+        return this
     }
 
-    public async updateAllowance(user: string, spender: string) {
+    public async updateAllowance(user: string, spender: string): Promise<Token> {
         this.rawAllowance = (await this.contract.allowance(user, spender)).toString()
 
         this.allowance = this.valueToTokenDecimals(this.rawAllowance)
+
+        return this
     }
 
     public get contract(): Erc20 {
         return Erc20__factory.connect(this.address, providers[this.chain])
     }
 
-    public static async initialize(address: string, chain: Chain): Promise<Token> {
+    public static async initialize(address: string, chain: Chain, user?: string): Promise<Token> {
         const contract = Erc20__factory.connect(address, providers[chain])
 
         const [
@@ -53,7 +57,7 @@ export class Token extends BaseToken<Erc20> {
             PriceService.getTokenPrice(address, chain)
         ])
 
-        return new Token(
+        let token = new Token(
             symbol,
             price,
             chain,
@@ -62,5 +66,10 @@ export class Token extends BaseToken<Erc20> {
             decimals,
             totalSupply,
         )
+
+        if (user)
+            token = await token.updateBalance(user)
+
+        return token
     }
 }

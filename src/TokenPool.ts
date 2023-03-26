@@ -49,15 +49,19 @@ export class TokenPool extends BaseToken<UniswapV2Pair> {
             throw Error('no balance')
 
         this.balance = this.valueToTokenDecimals(this.rawBalance)
+
+        return this
     }
 
     public async updateAllowance(user: string, spender: string) {
         this.rawAllowance = (await this.contract.allowance(user, spender)).toString()
 
         this.allowance = this.valueToTokenDecimals(this.rawAllowance)
+
+        return this
     }
 
-    public static async initialize(address: string, chain: Chain): Promise<TokenPool> {
+    public static async initialize(address: string, chain: Chain, user?: string): Promise<TokenPool> {
         const contract = UniswapV2Pair__factory.connect(address, providers[chain])
 
         const [
@@ -85,7 +89,7 @@ export class TokenPool extends BaseToken<UniswapV2Pair> {
             Token.initialize(token1Address, chain),
         ]) 
 
-        return new TokenPool(
+        let tokenPool = new TokenPool(
             token0,
             token1,
             reserves,
@@ -95,5 +99,10 @@ export class TokenPool extends BaseToken<UniswapV2Pair> {
             decimals,
             totalSupply,
         )
+
+        if (user)
+            tokenPool = await tokenPool.updateBalance(user)
+
+        return tokenPool
     }
 }
