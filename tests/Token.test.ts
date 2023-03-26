@@ -1,3 +1,4 @@
+import { utils } from 'ethers'
 import { Token } from '../src'
 import { Chains } from '../src/types/chain'
 
@@ -49,5 +50,13 @@ describe('Token', () => {
         expect(token.allowance).toBe(0)
         expect(token.rawAllowance).toBe('0')
     }) 
+
+    it('Should correctly parse value from token decimals', () => {
+        const amount = 10
+
+        const parsedAmount = token.valueFromTokenDecimals(amount)
+
+        expect(parsedAmount).toBe(utils.parseEther(amount.toString()).toString())
+    })
 })
 

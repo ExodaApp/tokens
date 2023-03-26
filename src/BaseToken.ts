@@ -1,4 +1,4 @@
-import { Contract } from 'ethers'
+import { Contract, utils } from 'ethers'
 import { Chain } from './types/chain'
 import { BigNumber } from 'bignumber.js'
 
@@ -34,6 +34,10 @@ export abstract class BaseToken<T extends Contract> {
         const basisPoints = new BigNumber(new BigNumber(10).pow(this.decimals))
 
         return value.div(basisPoints).toNumber()
+    }
+
+    public valueFromTokenDecimals(value: number): string {
+        return utils.parseUnits(value.toString(), this.decimals).toString()
     }
 
     public abstract get contract(): T
