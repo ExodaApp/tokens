@@ -16,6 +16,11 @@ export const Chains = {
     POLYGON,
     OPTIMISM,
     ARBITRUIM,
+
+    ETH_TESTNET,
+    AVAX_TESTNET,
+    BSC_TESTNET,
+    POLYGON_TESTNET,
 } as const
 
 type ChainKey = keyof typeof Chains 
