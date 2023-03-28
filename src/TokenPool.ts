@@ -4,6 +4,7 @@ import { Token } from './Token'
 import { UniswapV2Pair, UniswapV2Pair__factory } from './types/contracts'
 import { Chain } from './types/chain'
 import { providers } from './constants/providers'
+import { toExodaChain } from './helpers'
 
 interface Reserves {
     token0: string,
@@ -61,8 +62,9 @@ export class TokenPool extends BaseToken<UniswapV2Pair> {
         return this
     }
 
-    public static async initialize(address: string, chain: Chain, user?: string): Promise<TokenPool> {
-        const contract = UniswapV2Pair__factory.connect(address, providers[chain])
+    public static async initialize(address: string, chain: number, user?: string): Promise<TokenPool> {
+        const parsedChain = toExodaChain(chain)
+        const contract = UniswapV2Pair__factory.connect(address, providers[parsedChain])
 
         const [
             token0Address,
@@ -93,7 +95,7 @@ export class TokenPool extends BaseToken<UniswapV2Pair> {
             token0,
             token1,
             reserves,
-            chain,
+            parsedChain,
             address,
             name,
             decimals,

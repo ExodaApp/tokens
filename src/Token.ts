@@ -3,6 +3,7 @@ import { providers } from './constants/providers'
 import { Chain } from './types/chain'
 import { Erc20__factory, Erc20 } from './types/contracts'
 import { PriceService } from './PriceService'
+import { toExodaChain } from './helpers'
 
 export class Token extends BaseToken<Erc20> {
     constructor(
@@ -40,8 +41,9 @@ export class Token extends BaseToken<Erc20> {
         return Erc20__factory.connect(this.address, providers[this.chain])
     }
 
-    public static async initialize(address: string, chain: Chain, user?: string): Promise<Token> {
-        const contract = Erc20__factory.connect(address, providers[chain])
+    public static async initialize(address: string, chain: number, user?: string): Promise<Token> {
+        const parsedChain = toExodaChain(chain)
+        const contract = Erc20__factory.connect(address, providers[parsedChain])
 
         const [
             name,
@@ -54,13 +56,13 @@ export class Token extends BaseToken<Erc20> {
             contract.symbol(),
             contract.decimals().then(d => d),
             contract.totalSupply().then(ts => ts.toString()),
-            PriceService.getTokenPrice(address, chain)
+            PriceService.getTokenPrice(address, parsedChain)
         ])
 
         let token = new Token(
             symbol,
             price,
-            chain,
+            parsedChain,
             address,
             name,
             decimals,

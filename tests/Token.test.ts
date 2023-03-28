@@ -58,5 +58,23 @@ describe('Token', () => {
 
         expect(parsedAmount).toBe(utils.parseEther(amount.toString()).toString())
     })
+
+    it('Should not throw error if token chain is supported', async () => {
+        await Token.initialize(
+            '0x1f9840a85d5af5bf1d1762f925bdaddc4201f984', // UNI Token
+            Chains.ETH,
+        )
+    })
+
+    it('Should throw error if chain is not supported', async () => {
+        const WRONG_CHAIN = 0
+
+        const initPromise = Token.initialize(
+            '0x1f9840a85d5af5bf1d1762f925bdaddc4201f984', // UNI Token
+            WRONG_CHAIN
+        )
+
+        await expect(initPromise).rejects.toThrow(`${ WRONG_CHAIN } is not available on @exoda-app/tokens.`)
+    })
 })
 

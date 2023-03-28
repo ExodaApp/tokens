@@ -1,8 +1,10 @@
 import { Contract, utils } from 'ethers'
 import { Chain } from './types/chain'
 import { BigNumber } from 'bignumber.js'
+import { toExodaChain } from './helpers'
 
 export abstract class BaseToken<T extends Contract> {
+    public chain: Chain
     public allowance?: number
     public balance?: number
     public rawBalance?: string
@@ -12,12 +14,14 @@ export abstract class BaseToken<T extends Contract> {
     public abstract price: number | null
 
     constructor(
-        public chain: Chain,
+        chain: number,
         public address: string,
         public name: string,
         public decimals: number,
         public totalSupply: string,
-    ) {}
+    ) {
+        this.chain = toExodaChain(chain)
+    }
 
     public setBalance(rawBalance: string) {
         this.rawBalance = rawBalance
