@@ -44,12 +44,9 @@ export class TokenPool extends BaseToken<UniswapV2Pair> {
     }
 
     public async updateBalance(user: string) {
-        this.rawBalance = (await this.contract.balanceOf(user)).toString()
-
-        if (!this.rawBalance)
-            throw Error('no balance')
-
-        this.balance = this.valueToTokenDecimals(this.rawBalance)
+        const rawBalance = (await this.contract.balanceOf(user)).toString()
+        
+        this.setBalance(rawBalance)
 
         return this
     }

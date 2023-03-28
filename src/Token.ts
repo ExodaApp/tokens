@@ -19,20 +19,17 @@ export class Token extends BaseToken<Erc20> {
     }
 
     public async updateBalance(user: string): Promise<Token> {
-        this.rawBalance = (await this.contract.balanceOf(user)).toString()
+        const rawBalance = (await this.contract.balanceOf(user)).toString()
 
-        if (!this.rawBalance)
-            throw Error('no balance')
-
-        this.balance = this.valueToTokenDecimals(this.rawBalance)
+        this.setBalance(rawBalance)
 
         return this
     }
 
     public async updateAllowance(user: string, spender: string): Promise<Token> {
-        this.rawAllowance = (await this.contract.allowance(user, spender)).toString()
+        const rawAllowance = (await this.contract.allowance(user, spender)).toString()
 
-        this.allowance = this.valueToTokenDecimals(this.rawAllowance)
+        this.setAllowance(rawAllowance)
 
         return this
     }
