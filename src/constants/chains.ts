@@ -1,6 +1,15 @@
-import { Chain, IChainData, ChainMap, Chains } from '../types/chain'
+import {
+    Chain,
+    IChainData,
+    ChainMap,
+    Chains,
+    MainnetChain,
+    MainnetChains,
+} from '../types/chain'
 
 export const availableChains: Chain[] = Object.values(Chains)
+
+export const mainnetChains: MainnetChain[] = Object.values(MainnetChains)
 
 export const chainsInfo: ChainMap<IChainData> = {
     [Chains.ETH]: {

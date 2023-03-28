@@ -9,13 +9,17 @@ export const POLYGON_TESTNET = 80001
 export const OPTIMISM = 10
 export const ARBITRUIM = 42161
 
-export const Chains = {
+export const MainnetChains = {
     ETH,
     AVAX,
     BSC,
     POLYGON,
     OPTIMISM,
     ARBITRUIM,
+} as const
+
+export const Chains = {
+    ...MainnetChains,
 
     ETH_TESTNET,
     AVAX_TESTNET,
@@ -26,6 +30,9 @@ export const Chains = {
 type ChainKey = keyof typeof Chains 
 export type Chain = typeof Chains[ChainKey]
 
+type MainnetChainKey = keyof typeof MainnetChains
+export type MainnetChain = typeof MainnetChains[MainnetChainKey]
+
 export interface IChainData {
     name: string
     rpc: string
@@ -34,10 +41,8 @@ export interface IChainData {
     explorer: string
 }
 
-export type ChainMap<T> = {
-    [key in Chain]: T
-}
+export type ChainMap<T> = Record<Chain, T>
 
-export type OptionalChainMap<T> = {
-    [key in Chain]?: T
-}
+export type MainnetChainMap<T> = Record<MainnetChain, T>
+
+export type OptionalChainMap<T> = Partial<Record<Chain, T>>

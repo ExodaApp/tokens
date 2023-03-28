@@ -52,9 +52,9 @@ export class TokenPool extends BaseToken<UniswapV2Pair> {
     }
 
     public async updateAllowance(user: string, spender: string) {
-        this.rawAllowance = (await this.contract.allowance(user, spender)).toString()
+        const rawAllowance = (await this.contract.allowance(user, spender)).toString()
 
-        this.allowance = this.valueToTokenDecimals(this.rawAllowance)
+        this.setAllowance(rawAllowance)
 
         return this
     }

@@ -9,5 +9,10 @@ export const providers: ChainMap<JsonRpcBatchProvider> = {
     [Chains.BSC]: new JsonRpcBatchProvider(chainsInfo[Chains.BSC].rpc),
     [Chains.OPTIMISM]: new JsonRpcBatchProvider(chainsInfo[Chains.OPTIMISM].rpc),
     [Chains.ARBITRUIM]: new JsonRpcBatchProvider(chainsInfo[Chains.ARBITRUIM].rpc),
+
+    [Chains.ETH_TESTNET]: new JsonRpcBatchProvider(chainsInfo[Chains.ETH_TESTNET].rpc),
+    [Chains.AVAX_TESTNET]: new JsonRpcBatchProvider(chainsInfo[Chains.AVAX_TESTNET].rpc),
+    [Chains.POLYGON_TESTNET]: new JsonRpcBatchProvider(chainsInfo[Chains.POLYGON_TESTNET].rpc),
+    [Chains.BSC_TESTNET]: new JsonRpcBatchProvider(chainsInfo[Chains.BSC_TESTNET].rpc),
 }
 

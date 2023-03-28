@@ -3,7 +3,7 @@ import { providers } from './constants/providers'
 import { Chain } from './types/chain'
 import { Erc20__factory, Erc20 } from './types/contracts'
 import { PriceService } from './PriceService'
-import { toExodaChain } from './helpers'
+import { isMainnetChain, toExodaChain } from './helpers'
 
 export class Token extends BaseToken<Erc20> {
     constructor(
@@ -53,7 +53,9 @@ export class Token extends BaseToken<Erc20> {
             contract.symbol(),
             contract.decimals().then(d => d),
             contract.totalSupply().then(ts => ts.toString()),
-            PriceService.getTokenPrice(address, parsedChain)
+            isMainnetChain(parsedChain) ?
+                PriceService.getTokenPrice(address, parsedChain)
+                : null
         ])
 
         let token = new Token(

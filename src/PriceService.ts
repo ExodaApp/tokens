@@ -3,18 +3,23 @@ import { oracles, connectors } from './constants/oracles'
 import { providers } from './constants/providers'
 import { notEmpty } from './helpers'
 import { Oracle__factory, Erc20__factory } from './types/contracts'
-import { Chain } from './types/chain'
+import { MainnetChain } from './types/chain'
 
 const TEN = new BigNumber(10)
 
 export class PriceService {
-    public static async getTokenPrice(tokenAddress: string, chain: Chain): Promise<number | null> {
+    public static async getTokenPrice(tokenAddress: string, chain: MainnetChain): Promise<number | null> {
+        const oracleAddress = oracles[chain]
+
+        if (!oracleAddress)
+            return null
+
         const token = Erc20__factory.connect(
             tokenAddress,
             providers[chain],
         )
         const oracle = Oracle__factory.connect(
-            oracles[chain],
+            oracleAddress,
             providers[chain],
         )
 

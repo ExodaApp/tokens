@@ -1,6 +1,6 @@
-import { ChainMap, Chains } from "../types/chain"
+import { MainnetChainMap, Chains } from "../types/chain"
 
-export const oracles: ChainMap<string> = {
+export const oracles: MainnetChainMap<string> = {
     [Chains.ETH]: '0x07D91f5fb9Bf7798734C3f606dB065549F6893bb',
     [Chains.BSC]: '0xfbD61B037C325b959c0F6A7e69D8f37770C2c550',
     [Chains.POLYGON]: '0x7F069df72b7A39bCE9806e3AfaF579E54D8CF2b9',
@@ -9,7 +9,7 @@ export const oracles: ChainMap<string> = {
     [Chains.AVAX]: '0xBd0c7AaF0bF082712EbE919a9dD94b2d978f79A9',
 } 
 
-export const connectors: ChainMap<string[]> = {
+export const connectors: MainnetChainMap<string[]> = {
     [Chains.ETH]: [
         '0xdac17f958d2ee523a2206206994597c13d831ec7', // USDT
         '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48', // USDC
