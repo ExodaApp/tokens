@@ -1,6 +1,6 @@
 import { Contract, utils } from 'ethers'
 import { Chain } from './types/chain'
-import { BigNumber } from 'bignumber.js'
+import { ethers } from 'ethers'
 
 export abstract class BaseToken<T extends Contract> {
     public allowance?: number
@@ -30,10 +30,12 @@ export abstract class BaseToken<T extends Contract> {
     }
 
     public valueToTokenDecimals(rawValue: string): number {
-        const value = new BigNumber(rawValue.toString())
-        const basisPoints = new BigNumber(new BigNumber(10).pow(this.decimals))
+        let [integer, decimalPlaces] = ethers.utils.formatUnits(rawValue, this.decimals).split('.')
 
-        return value.div(basisPoints).toNumber()
+        if (decimalPlaces.length > 4)
+            decimalPlaces = decimalPlaces.slice(0, 5)
+
+        return +`${integer}.${decimalPlaces}`
     }
 
     public valueFromTokenDecimals(value: number): string {
