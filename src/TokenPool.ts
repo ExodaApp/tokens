@@ -2,9 +2,10 @@ import { BigNumber } from 'bignumber.js'
 import { BaseToken } from './BaseToken'
 import { Token } from './Token'
 import { UniswapV2Pair, UniswapV2Pair__factory } from './types/contracts'
-import { Chain } from './types/chain'
-import { providers } from './constants/providers'
+import { Chain, InitializeParams } from './types'
+import { getProvider } from './constants/providers'
 import { toExodaChain } from './helpers'
+import { JsonRpcBatchProvider } from '@ethersproject/providers'
 
 interface Reserves {
     token0: string,
@@ -21,8 +22,9 @@ export class TokenPool extends BaseToken<UniswapV2Pair> {
         name: string,
         decimals: number,
         totalSupply: string,
+        provider: JsonRpcBatchProvider,
     ) {
-        super(chain, address, name, decimals, totalSupply)
+        super(chain, address, name, decimals, totalSupply, provider)
     }
 
     public get symbol(): string {
@@ -30,7 +32,7 @@ export class TokenPool extends BaseToken<UniswapV2Pair> {
     }
 
     public get contract(): UniswapV2Pair {
-        return UniswapV2Pair__factory.connect(this.address, providers[this.chain])
+        return  UniswapV2Pair__factory.connect(this.address, this.provider)
     }
 
     public get price(): number | null {
@@ -59,9 +61,19 @@ export class TokenPool extends BaseToken<UniswapV2Pair> {
         return this
     }
 
-    public static async initialize(address: string, chain: number, user?: string): Promise<TokenPool> {
+    public static async initialize({
+        address,
+        chain,
+        user,
+        rpc,
+    }: InitializeParams): Promise<TokenPool> {
         const parsedChain = toExodaChain(chain)
-        const contract = UniswapV2Pair__factory.connect(address, providers[parsedChain])
+        const provider = getProvider(parsedChain, rpc)
+
+        const contract = UniswapV2Pair__factory.connect(
+            address,
+            provider,
+        )
 
         const [
             token0Address,
@@ -84,8 +96,8 @@ export class TokenPool extends BaseToken<UniswapV2Pair> {
         ])
 
         const [token0, token1] = await Promise.all([
-            Token.initialize(token0Address, chain),
-            Token.initialize(token1Address, chain),
+            Token.initialize({ address: token0Address, chain, rpc }),
+            Token.initialize({ address: token1Address, chain, rpc }),
         ]) 
 
         let tokenPool = new TokenPool(
@@ -97,6 +109,7 @@ export class TokenPool extends BaseToken<UniswapV2Pair> {
             name,
             decimals,
             totalSupply,
+            provider,
         )
 
         if (user)

@@ -1,5 +1,5 @@
 import { JsonRpcBatchProvider } from '@ethersproject/providers'
-import { ChainMap, Chains } from '../types/chain'
+import { Chain, ChainMap, Chains } from '../types/chain'
 import { chainsInfo } from './chains'
 
 export const providers: ChainMap<JsonRpcBatchProvider> = {
@@ -16,3 +16,15 @@ export const providers: ChainMap<JsonRpcBatchProvider> = {
     [Chains.BSC_TESTNET]: new JsonRpcBatchProvider(chainsInfo[Chains.BSC_TESTNET].rpc),
 }
 
+const customProviders: Partial<Record<Chain, JsonRpcBatchProvider>> = {}
+
+export const getProvider = (chain: Chain, rpc?: string): JsonRpcBatchProvider => {
+    if (rpc) {
+        if (!customProviders[chain])
+            customProviders[chain] = new JsonRpcBatchProvider(rpc)
+
+       return customProviders[chain]!
+    }
+
+    return providers[chain]
+}

@@ -1,9 +1,10 @@
 import { BaseToken } from './BaseToken'
-import { providers } from './constants/providers'
-import { Chain } from './types/chain'
+import { getProvider } from './constants/providers'
+import { Chain, InitializeParams } from './types'
 import { Erc20__factory, Erc20 } from './types/contracts'
 import { PriceService } from './PriceService'
 import { isMainnetChain, toExodaChain } from './helpers'
+import { JsonRpcBatchProvider } from '@ethersproject/providers'
 
 export class Token extends BaseToken<Erc20> {
     constructor(
@@ -14,8 +15,9 @@ export class Token extends BaseToken<Erc20> {
         name: string,
         decimals: number,
         totalSupply: string,
+        provider: JsonRpcBatchProvider
     ) {
-        super(chain, address, name, decimals, totalSupply)
+        super(chain, address, name, decimals, totalSupply, provider)
     }
 
     public async updateBalance(user: string): Promise<Token> {
@@ -35,12 +37,22 @@ export class Token extends BaseToken<Erc20> {
     }
 
     public get contract(): Erc20 {
-        return Erc20__factory.connect(this.address, providers[this.chain])
+        return Erc20__factory.connect(this.address, this.provider)
     }
 
-    public static async initialize(address: string, chain: number, user?: string): Promise<Token> {
+    public static async initialize({
+        address,
+        chain,
+        user,
+        rpc,
+    }: InitializeParams): Promise<Token> {
         const parsedChain = toExodaChain(chain)
-        const contract = Erc20__factory.connect(address, providers[parsedChain])
+        const provider = getProvider(parsedChain, rpc)
+
+        const contract = Erc20__factory.connect(
+            address,
+            provider,
+        )
 
         const [
             name,
@@ -66,6 +78,7 @@ export class Token extends BaseToken<Erc20> {
             name,
             decimals,
             totalSupply,
+            provider,
         )
 
         if (user)

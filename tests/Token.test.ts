@@ -11,10 +11,10 @@ describe('Token', () => {
 
         beforeAll(async () => {
             console.time('Token initialization')
-            token = await Token.initialize(
-                '0x1f9840a85d5af5bf1d1762f925bdaddc4201f984', // UNI Token
-                Chains.ETH,
-            )
+            token = await Token.initialize({
+                address: '0x1f9840a85d5af5bf1d1762f925bdaddc4201f984', // UNI Token
+                chain: Chains.ETH,
+            })
             console.timeEnd('Token initialization')
         })
 
@@ -59,34 +59,32 @@ describe('Token', () => {
 
             expect(parsedAmount).toBe(utils.parseEther(amount.toString()).toString())
         })
-    })
-
-    describe('Token chain', () => {
-        it('Should not throw error if token chain is supported', async () => {
-            await Token.initialize(
-                '0x1f9840a85d5af5bf1d1762f925bdaddc4201f984', // UNI Token
-                Chains.ETH,
-            )
-        })
 
         it('Should throw error if chain is not supported', async () => {
             const WRONG_CHAIN = 0
 
-            const initPromise = Token.initialize(
-                '0x1f9840a85d5af5bf1d1762f925bdaddc4201f984', // UNI Token
-                WRONG_CHAIN
-            )
-
+            const initPromise = Token.initialize( {
+                address: '0x2538313636975095fa0a97c4bb4e458c5e139c9e',
+                chain: WRONG_CHAIN,
+            }) 
             await expect(initPromise).rejects.toThrow(`${ WRONG_CHAIN } is not available on @exoda-app/tokens.`)
         })
 
-        it('Should initialize token price as null if testnet token', async () => {
-            const token = await Token.initialize(
-                '0x943552909a7315a79befabed2c542dcbe332addb', // Mocked busd found in fuji network
-                Chains.AVAX_TESTNET,
-            )
+        it('Should initialize token price as null if chain is testnet', async () => {
+            const token = await Token.initialize( {
+                address: '0x943552909a7315a79befabed2c542dcbe332addb',
+                chain: Chains.AVAX_TESTNET,
+            }) 
 
             expect(token.price).toBeNull
+        })
+
+        it('Should use custom rpc', async () => {
+            await Token.initialize({
+                address: '0x1f9840a85d5af5bf1d1762f925bdaddc4201f984',
+                chain: Chains.ETH,
+                rpc: 'https://eth-rpc.gateway.pokt.network',
+            })
         })
     })
 })
