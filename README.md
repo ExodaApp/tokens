@@ -57,7 +57,7 @@ Represents an `Uniswap V2 Pair` token. Extends `BaseToken`
 - `updateBalance(user: string)`: fetches user balance from contract and call `BaseToken.setBalance` with the value received
 - `updateAllowance(user: string)`: fetches user allowance from contract and call `BaseToken.setAllowance` with the value received
 
-## Supported chains
+## Supported chains for token prices
 - ETH
 - POLYGON
 - BSC
