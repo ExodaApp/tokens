@@ -1,13 +1,19 @@
 # @exoda-app/tokens
 This library provides an easy way to instaciate `ERC20` and `Uniswap V2 pair` tokens.
 
+## Install
+```bash
+npm install @exoda-app/tokens
+```
+
 ## Usage
 ```ts
 import { Token, TokenPool, Chain } from '@exoda-app/tokens'
 
-const token = await Token.init('0x...', Chains.ETH)
+const token = await Token.init({ address: '0x...', chain: Chains.ETH })
 
-const poolToken = await TokenPool.init('0x...', Chains.ETH)
+// You can optionally pass a custom rpc for both Token and TokenPool initializers
+const poolToken = await TokenPool.init({ address: '0x...', chain: Chains.ETH, rpc: 'https://rpc.ankr.com/eth' })
 ```
 
 ## Models
@@ -29,8 +35,8 @@ Both `Token` and `TokenPool` extends `BaseToken`, therefore the methods and inst
 - abstract price: number | null
 
 #### Methods
-- `setBalance(rawBalance:)`: receives a balance in token basis points, sets `rawBalance`, converts to base 10 and sets `balance`
-- `setAllowance(rawAllowance:)`: receives a allowance in token basis points, sets `rawAllowance`, converts to base 10 and sets `allowance`
+- `setBalance(rawBalance: string)`: receives a balance in token basis points, sets `rawBalance`, converts to base 10 and sets `balance`
+- `setAllowance(rawAllowance: string)`: receives a allowance in token basis points, sets `rawAllowance`, converts to base 10 and sets `allowance`
 
 ### Token
 Represents an `ERC20` token. Extends `BaseToken`
@@ -57,4 +63,5 @@ Represents an `Uniswap V2 Pair` token. Extends `BaseToken`
 - BSC
 - OPTIMISM
 - ARBITRUM
+
 
