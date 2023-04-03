@@ -25,4 +25,14 @@ describe('TokenPool', () => {
     it('Should initialize symbol', () => {
         expect(tokenPool.symbol).toBe('DAI-WETH')
     })
+
+    it('Should set underlying token prices', () => {
+        const token0Price = 1.5
+        const token1Price = 2.5
+
+        tokenPool.setUnderlyingTokenPrices(token0Price, token1Price)
+
+        expect(tokenPool.token0.price).toBe(token0Price)
+        expect(tokenPool.token1.price).toBe(token1Price)
+    })
 })

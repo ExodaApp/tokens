@@ -61,7 +61,7 @@ export class TokenPool extends BaseToken<UniswapV2Pair> {
         return this
     }
 
-    public setTokenPrices(token0Price: number, token1Price: number) {
+    public setUnderlyingTokenPrices(token0Price: number, token1Price: number) {
         this.token0.price = token0Price
         this.token1.price = token1Price
     }
