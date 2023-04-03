@@ -5,8 +5,8 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "rimraf dist && tsc -d -p tsconfig.json",
-    "predeploy": "npm run build",
-    "deploy": "npm i && npm run build && npm version patch --force && npm publish --access public",
+    "predeploy": "npm test && npm run build && npm i && npm run build",
+    "deploy": "npm version patch --force && npm publish --access public",
     "test": "jest",
     "generate:types": "typechain --target ethers-v5 --out-dir src/types/contracts './src/abis/*.json'"
   },
