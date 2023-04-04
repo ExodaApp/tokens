@@ -86,6 +86,10 @@ describe('Token', () => {
                 rpc: 'https://eth-rpc.gateway.pokt.network',
             })
         })
+
+        it('Should return an instance of Token when cloned', () => {
+            expect(token.clone()).toBeInstanceOf(Token)
+        })
     })
 })
 

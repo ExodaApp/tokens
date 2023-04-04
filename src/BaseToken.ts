@@ -40,6 +40,10 @@ export abstract class BaseToken<T extends Contract> {
         return +`${integer}.${decimalPlaces}`
     }
 
+    public clone(): this {
+        return this
+    }
+
     public valueFromTokenDecimals(value: number): string {
         return utils.parseUnits(value.toString(), this.decimals).toString()
     }

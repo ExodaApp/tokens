@@ -35,4 +35,8 @@ describe('TokenPool', () => {
         expect(tokenPool.token0.price).toBe(token0Price)
         expect(tokenPool.token1.price).toBe(token1Price)
     })
+
+    it('Should return an instnace of TokenPool when cloned', () => {
+        expect(tokenPool.clone()).toBeInstanceOf(TokenPool)
+    })
 })
