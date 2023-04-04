@@ -37,6 +37,9 @@ describe('TokenPool', () => {
     })
 
     it('Should return an instnace of TokenPool when cloned', () => {
-        expect(tokenPool.clone()).toBeInstanceOf(TokenPool)
+        const clone = tokenPool.clone()
+
+        expect(clone).toBeInstanceOf(TokenPool)
+        expect(clone).not.toBe(tokenPool)
     })
 })
