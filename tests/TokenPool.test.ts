@@ -41,5 +41,7 @@ describe('TokenPool', () => {
 
         expect(clone).toBeInstanceOf(TokenPool)
         expect(clone).not.toBe(tokenPool)
+        expect(clone.token0).not.toBe(tokenPool.token0)
+        expect(clone.token1).not.toBe(tokenPool.token1)
     })
 })

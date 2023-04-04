@@ -66,6 +66,15 @@ export class TokenPool extends BaseToken<UniswapV2Pair> {
         this.token1.price = token1Price
     }
 
+    public clone(): TokenPool {
+        const clone = Object.assign(Object.create(Object.getPrototypeOf(this)), this)
+
+        clone.token0 = this.token0.clone()
+        clone.token1 = this.token1.clone()
+
+        return clone
+    }
+
     public static async initialize({
         address,
         chain,

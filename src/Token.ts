@@ -20,6 +20,10 @@ export class Token extends BaseToken<Erc20> {
         super(chain, address, name, decimals, totalSupply, provider)
     }
 
+    public get contract(): Erc20 {
+        return Erc20__factory.connect(this.address, this.provider)
+    }
+
     public async updateBalance(user: string): Promise<Token> {
         const rawBalance = (await this.contract.balanceOf(user)).toString()
 
@@ -36,8 +40,8 @@ export class Token extends BaseToken<Erc20> {
         return this
     }
 
-    public get contract(): Erc20 {
-        return Erc20__factory.connect(this.address, this.provider)
+    public clone(): Token {
+        return Object.assign(Object.create(Object.getPrototypeOf(this)), this)
     }
 
     public static async initialize({

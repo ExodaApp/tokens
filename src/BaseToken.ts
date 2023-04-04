@@ -45,8 +45,4 @@ export abstract class BaseToken<T extends Contract> {
     }
 
     public abstract get contract(): T
-
-    public clone(): this {
-        return Object.assign(Object.create(Object.getPrototypeOf(this)), this)
-    }
 }
