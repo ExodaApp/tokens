@@ -10,6 +10,7 @@ export class Token extends BaseToken<Erc20> {
     constructor(
         public symbol: string,
         public price: number | null,
+        public logo: string | null,
         chain: Chain,
         address: string,
         name: string,
@@ -77,6 +78,7 @@ export class Token extends BaseToken<Erc20> {
         let token = new Token(
             symbol,
             price,
+            null,
             parsedChain,
             address,
             name,
