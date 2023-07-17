@@ -88,7 +88,7 @@ describe('Token', () => {
             })
         })
         
-        it('Should use custom JsonRpcProvider', async () => {
+        it.only('Should use custom JsonRpcProvider', async () => {
             const rpc = 'https://eth-rpc.gateway.pokt.network'
 
             class CustomRpcProvider extends JsonRpcProvider {

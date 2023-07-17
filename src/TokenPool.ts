@@ -111,8 +111,8 @@ export class TokenPool extends BaseToken<UniswapV2Pair> {
         ])
 
         const [token0, token1] = await Promise.all([
-            Token.initialize({ address: token0Address, chain, rpc }),
-            Token.initialize({ address: token1Address, chain, rpc }),
+            Token.initialize({ address: token0Address, chain, provider: rpcProvider }),
+            Token.initialize({ address: token1Address, chain, provider: rpcProvider }),
         ]) 
 
         let tokenPool = new TokenPool(
