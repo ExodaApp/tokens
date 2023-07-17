@@ -4,7 +4,7 @@ import { Chain, InitializeParams } from './types'
 import { Erc20__factory, Erc20 } from './types/contracts'
 import { PriceService } from './PriceService'
 import { isMainnetChain, toExodaChain } from './helpers'
-import { JsonRpcBatchProvider } from '@ethersproject/providers'
+import { JsonRpcProvider } from '@ethersproject/providers'
 
 export class Token extends BaseToken<Erc20> {
     constructor(
@@ -16,7 +16,7 @@ export class Token extends BaseToken<Erc20> {
         name: string,
         decimals: number,
         totalSupply: string,
-        provider: JsonRpcBatchProvider
+        provider: JsonRpcProvider
     ) {
         super(chain, address, name, decimals, totalSupply, provider)
     }
@@ -50,13 +50,16 @@ export class Token extends BaseToken<Erc20> {
         chain,
         user,
         rpc,
+        provider
     }: InitializeParams): Promise<Token> {
+
         const parsedChain = toExodaChain(chain)
-        const provider = getProvider(parsedChain, rpc)
+        const rpcProvider = provider || getProvider(parsedChain, rpc)
+
 
         const contract = Erc20__factory.connect(
             address,
-            provider,
+            rpcProvider,
         )
 
         const [
@@ -84,7 +87,7 @@ export class Token extends BaseToken<Erc20> {
             name,
             decimals,
             totalSupply,
-            provider,
+            rpcProvider,
         )
 
         if (user)

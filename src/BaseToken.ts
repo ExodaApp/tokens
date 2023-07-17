@@ -1,7 +1,7 @@
 import { Contract, utils } from 'ethers'
 import { Chain } from './types/chain'
 import { ethers } from 'ethers'
-import { JsonRpcBatchProvider } from '@ethersproject/providers'
+import { JsonRpcProvider } from '@ethersproject/providers'
 
 export abstract class BaseToken<T extends Contract> {
     public allowance?: number
@@ -18,7 +18,7 @@ export abstract class BaseToken<T extends Contract> {
         public name: string,
         public decimals: number,
         public totalSupply: string,
-        public provider: JsonRpcBatchProvider
+        public provider: JsonRpcProvider
     ) {}
 
     public setBalance(rawBalance: string) {

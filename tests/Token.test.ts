@@ -1,6 +1,7 @@
 import { utils } from 'ethers'
 import { Token } from '../src'
 import { Chains } from '../src/types/chain'
+import { JsonRpcProvider } from '@ethersproject/providers'
 
 const UNI_HOLDER = '0x63B53181bDC48A9FBF1d23D461D3CFd82B0aBC83'
 const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'
@@ -85,6 +86,24 @@ describe('Token', () => {
                 chain: Chains.ETH,
                 rpc: 'https://eth-rpc.gateway.pokt.network',
             })
+        })
+        
+        it('Should use custom JsonRpcProvider', async () => {
+            const rpc = 'https://eth-rpc.gateway.pokt.network'
+
+            class CustomRpcProvider extends JsonRpcProvider {
+                send(method: string, params: Array<any>): Promise<any> {
+                    return super.send(method, params)
+                }
+            }
+
+            const token = await Token.initialize({
+                address: '0x1f9840a85d5af5bf1d1762f925bdaddc4201f984',
+                chain: Chains.ETH,
+                provider: new CustomRpcProvider(rpc)
+            })
+
+            expect(token).toBeInstanceOf(Token)
         })
 
         it('Should return an instance of Token when cloned', () => {

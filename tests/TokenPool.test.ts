@@ -1,3 +1,4 @@
+import { JsonRpcProvider } from '@ethersproject/providers'
 import { TokenPool } from '../src'
 import { Chains } from '../src/types/chain'
 
@@ -7,7 +8,7 @@ describe('TokenPool', () => {
     beforeAll(async () => {
         console.time('Token pool initialization')
         tokenPool = await TokenPool.initialize({
-            address: '0xA478c2975Ab1Ea89e8196811F51A7B7Ade33eB11', // Uniswap's WETH-DAI
+            address: '0xa478c2975ab1ea89e8196811f51a7b7ade33eb11', // Uniswap's WETH-DAI
             chain: Chains.ETH,
         })
         console.timeEnd('Token pool initialization')
@@ -43,5 +44,23 @@ describe('TokenPool', () => {
         expect(clone).not.toBe(tokenPool)
         expect(clone.token0).not.toBe(tokenPool.token0)
         expect(clone.token1).not.toBe(tokenPool.token1)
+    })
+
+    it('Should use custom JsonRpcProvider', async () => {
+        const rpc = 'https://eth-rpc.gateway.pokt.network'
+
+        class CustomRpcProvider extends JsonRpcProvider {
+            send(method: string, params: Array<any>): Promise<any> {
+                return super.send(method, params)
+            }
+        }
+
+        const tokenPool = await TokenPool.initialize({
+            address: '0xa478c2975ab1ea89e8196811f51a7b7ade33eb11',
+            chain: Chains.ETH,
+            provider: new CustomRpcProvider(rpc)
+        })
+
+        expect(tokenPool).toBeInstanceOf(TokenPool)
     })
 })

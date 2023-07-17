@@ -5,7 +5,7 @@ import { UniswapV2Pair, UniswapV2Pair__factory } from './types/contracts'
 import { Chain, InitializeParams } from './types'
 import { getProvider } from './constants/providers'
 import { toExodaChain } from './helpers'
-import { JsonRpcBatchProvider } from '@ethersproject/providers'
+import { JsonRpcProvider } from '@ethersproject/providers'
 
 interface Reserves {
     token0: string,
@@ -22,7 +22,7 @@ export class TokenPool extends BaseToken<UniswapV2Pair> {
         name: string,
         decimals: number,
         totalSupply: string,
-        provider: JsonRpcBatchProvider,
+        provider: JsonRpcProvider,
     ) {
         super(chain, address, name, decimals, totalSupply, provider)
     }
@@ -80,13 +80,14 @@ export class TokenPool extends BaseToken<UniswapV2Pair> {
         chain,
         user,
         rpc,
+        provider
     }: InitializeParams): Promise<TokenPool> {
         const parsedChain = toExodaChain(chain)
-        const provider = getProvider(parsedChain, rpc)
+        const rpcProvider = provider || getProvider(parsedChain, rpc)
 
         const contract = UniswapV2Pair__factory.connect(
             address,
-            provider,
+            rpcProvider,
         )
 
         const [
@@ -123,7 +124,7 @@ export class TokenPool extends BaseToken<UniswapV2Pair> {
             name,
             decimals,
             totalSupply,
-            provider,
+            rpcProvider,
         )
 
         if (user)
